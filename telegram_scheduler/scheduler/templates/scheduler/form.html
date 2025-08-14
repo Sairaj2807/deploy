@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Telegram Scheduler</title>
+</head>
+<body>
+    <h2>Schedule a Telegram Message</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Schedule Message</button>
+    </form>
+</body>
+</html>
