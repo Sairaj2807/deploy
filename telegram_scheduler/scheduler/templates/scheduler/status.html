@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Status - Telegram Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            display: inline-block;
+            margin-right: 15px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: #2980b9;
+        }
+        .messages-table {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .message-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .image-indicator {
+            color: #6c757d;
+            font-size: 12px;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .no-messages {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 Telegram Message Status</h1>
+        <p>View the status of your last 10 scheduled messages</p>
+    </div>
+
+    <div class="nav-links">
+        <a href="/">📝 Schedule New Message</a>
+        <a href="/status/">🔄 Refresh Status</a>
+    </div>
+
+    <div class="messages-table">
+        {% if messages %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Message Preview</th>
+                        <th>Channels</th>
+                        <th>Scheduled Time</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Sent At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for message in messages %}
+                        <tr>
+                            <td>
+                                <div class="message-preview" title="{{ message.message }}">
+                                    {{ message.message|truncatechars:50 }}
+                                </div>
+                                {% if message.image %}
+                                    <div class="image-indicator">📷 Has Image</div>
+                                {% endif %}
+                            </td>
+                            <td>{{ message.channels_display }}</td>
+                            <td>{{ message.send_time|time:"H:i" }}</td>
+                            <td>
+                                <span class="status-badge {% if message.sent %}status-completed{% else %}status-pending{% endif %}">
+                                    {{ message.status }}
+                                </span>
+                            </td>
+                            <td class="timestamp">{{ message.created_at|date:"M d, Y H:i" }}</td>
+                            <td class="timestamp">
+                                {% if message.sent_at %}
+                                    {{ message.sent_at|date:"M d, Y H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="no-messages">
+                <h3>No messages found</h3>
+                <p>You haven't scheduled any messages yet.</p>
+                <a href="/" style="color: #3498db;">Schedule your first message</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(function() {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
+

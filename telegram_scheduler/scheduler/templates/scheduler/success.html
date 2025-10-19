@@ -1,2 +1,78 @@
-<h3>Message Scheduled Successfully!</h3>
-<a href="/">Schedule Another</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - Telegram Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .success-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .success-title {
+            color: #27ae60;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .success-message {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+        .action-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .action-links a {
+            display: inline-block;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .primary-link {
+            background-color: #27ae60;
+            color: white;
+        }
+        .primary-link:hover {
+            background-color: #229954;
+        }
+        .secondary-link {
+            background-color: #3498db;
+            color: white;
+        }
+        .secondary-link:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        <h2 class="success-title">Message Scheduled Successfully!</h2>
+        <p class="success-message">
+            Your message has been added to the queue and will be sent at the scheduled time.
+        </p>
+        <div class="action-links">
+            <a href="/" class="primary-link">📝 Schedule Another</a>
+            <a href="/status/" class="secondary-link">📊 View Status</a>
+        </div>
+    </div>
+</body>
+</html>

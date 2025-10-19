@@ -2,14 +2,367 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .form-container {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-container {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input[type="text"], input[type="time"], input[type="file"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: normal;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #229954;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .status-table th, .status-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .status-table th {
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        .status-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .message-preview {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .image-indicator {
+            color: #6c757d;
+            font-size: 11px;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: #6c757d;
+        }
+        .no-messages {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-    <h2>Schedule a Telegram Message</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Schedule Message</button>
-    </form>
+    <div class="header">
+        <h1>📱 Telegram Message Scheduler</h1>
+        <p>Schedule messages and monitor their status</p>
+    </div>
+
+    <div class="container">
+        <!-- Schedule Form Section -->
+        <div class="form-container">
+            <h2 class="section-title">📝 Schedule New Message</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.message.id_for_label }}">Message Content:</label>
+                    {{ form.message }}
+                    <div class="help-text">Enter the message you want to send</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.image.id_for_label }}">Image (Optional):</label>
+                    {{ form.image }}
+                    <div class="help-text">Upload an image to include with your message</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.send_time.id_for_label }}">Send Time:</label>
+                    {{ form.send_time }}
+                    <div class="help-text">Time in 24-hour format (HH:MM)</div>
+                    <p>Note: Time in 24-hour format (HH:MM)</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Channels:</label>
+                    <div class="checkbox-group">
+                        {{ form.channels }}
+                    </div>
+                    <div class="help-text">Select one or more channels to send the message to</div>
+                </div>
+
+                <button type="submit">🚀 Schedule Message</button>
+            </form>
+        </div>
+
+        <!-- Status Section -->
+        <div class="status-container">
+            <h2 class="section-title">📊 Message Status (Last 10)</h2>
+            <button class="refresh-btn" onclick="window.location.reload()">🔄 Refresh</button>
+            
+            {% if messages %}
+                <table class="status-table">
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>Channels</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in messages %}
+                            <tr>
+                                <td>
+                                    <div class="message-preview" title="{{ message.message }}">
+                                        {{ message.message|truncatechars:30 }}
+                                    </div>
+                                    {% if message.image %}
+                                        <div class="image-indicator">📷</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ message.channels_display }}</td>
+                                <td>{{ message.send_time|time:"H:i" }}</td>
+                                <td>
+                                    <span class="status-badge {% if message.sent %}status-completed{% else %}status-pending{% endif %}">
+                                        {{ message.status }}
+                                    </span>
+                                </td>
+                                <td class="timestamp">
+                                    {% if message.created_at %}
+                                        {{ message.created_at|date:"M d, H:i" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-messages">
+                    <h3>No messages found</h3>
+                    <p>Schedule your first message to see it here.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh only the status section every 30 seconds
+        function refreshStatus() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newStatusContainer = doc.querySelector('.status-container');
+                    const currentStatusContainer = document.querySelector('.status-container');
+                    if (newStatusContainer && currentStatusContainer) {
+                        currentStatusContainer.innerHTML = newStatusContainer.innerHTML;
+                    }
+                })
+                .catch(error => console.log('Status refresh failed:', error));
+        }
+        
+        // Refresh status every 30 seconds
+        setInterval(refreshStatus, 30000);
+        
+        // Prevent form data loss on page refresh
+        window.addEventListener('beforeunload', function(e) {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            let hasData = false;
+            
+            for (let [key, value] of formData.entries()) {
+                if (value && value !== '') {
+                    hasData = true;
+                    break;
+                }
+            }
+            
+            if (hasData) {
+                e.preventDefault();
+                e.returnValue = 'Procced Next';
+                return e.returnValue;
+            }
+        });
+        
+        // Save form data to localStorage as user types
+        function saveFormData() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key !== 'csrfmiddlewaretoken') {
+                    if (data[key]) {
+                        if (Array.isArray(data[key])) {
+                            data[key].push(value);
+                        } else {
+                            data[key] = [data[key], value];
+                        }
+                    } else {
+                        data[key] = value;
+                    }
+                }
+            }
+            
+            localStorage.setItem('telegramFormData', JSON.stringify(data));
+        }
+        
+        // Restore form data from localStorage
+        function restoreFormData() {
+            const savedData = localStorage.getItem('telegramFormData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    const form = document.querySelector('form');
+                    
+                    // Restore text inputs
+                    Object.keys(data).forEach(key => {
+                        const element = form.querySelector(`[name="${key}"]`);
+                        if (element) {
+                            if (element.type === 'checkbox') {
+                                element.checked = data[key].includes(element.value);
+                            } else if (element.type !== 'file') {
+                                element.value = Array.isArray(data[key]) ? data[key][0] : data[key];
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.log('Could not restore form data:', e);
+                }
+            }
+        }
+        
+        // Clear saved data after successful form submission
+        function clearSavedData() {
+            localStorage.removeItem('telegramFormData');
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            restoreFormData();
+            
+            const form = document.querySelector('form');
+            form.addEventListener('input', saveFormData);
+            form.addEventListener('change', saveFormData);
+            form.addEventListener('submit', clearSavedData);
+        });
+    </script>
 </body>
 </html>
